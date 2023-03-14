@@ -2,14 +2,18 @@ defmodule SSE_READER do
   use GenServer
 
   def start(url) do
-    GenServer.start_link(__MODULE__, url)
+    GenServer.start_link(__MODULE__, url, name: __MODULE__)
   end
 
   def init(url) do
     IO.puts "Connecting to stream..."
-     HTTPoison.get!(url, [], [recv_timeout: :infinity, stream_to: self()])
+    HTTPoison.get!(url, [], [recv_timeout: :infinity, stream_to: self()])
+    spawn(fn -> killMe() end )
     {:ok, nil}
   end
+
+
+
 
   def handle_info(%HTTPoison.AsyncChunk{chunk: chunk}, state) do
     [_,data] =  Regex.run(~r/data: ({.+})\n\n$/, chunk)
@@ -17,6 +21,7 @@ defmodule SSE_READER do
       {:ok, chunkData} ->
         #IO.inspect(chunkData["message"]["tweet"]["text"])
         send(LoadBalancer, chunkData)
+        send(HashtagExtractor, chunkData)
         #send(Printer, chunkData)
         #:timer.sleep(1000)
       {:error, _ } -> nil
@@ -35,15 +40,16 @@ defmodule SSE_READER do
     {:noreply, state}
   end
 
-  def handle_call(:killMessageTrigger,_from, state) do
+  def handle_call(:killMessageTrigger , _from, state) do
+    GenServer.cast(LoadBalancer, :killMessage)
     spawn(fn -> killMe() end )
-    GenServer.call(LoadBalancer, :killMessage)
     {:noreply, state}
   end
 
-  defp killMe() do
-    :timer.sleep(:rand.uniform(5000) + 3000)
-    GenServer.call(__MODULE__, :killMessageTrigger )
+
+  def killMe() do
+    :timer.sleep(:rand.uniform(100)+3000)
+    GenServer.call(__MODULE__, :killMessageTrigger)
   end
 
 

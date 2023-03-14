@@ -1,10 +1,8 @@
 defmodule Lab1 do
 
   def run do
-    #Printer.start
-    PrinterPoolSupervisor.start_link(:ok)
-    LoadBalancer.start
-    #HashtagExtractor.start
+    PrinterPoolSupervisor.start_link()
+    HashtagExtractor.start
     SSE_READER.start("localhost:4000/tweets/1")
     SSE_READER.start("localhost:4000/tweets/2")
 

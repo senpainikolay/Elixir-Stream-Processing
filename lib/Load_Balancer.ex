@@ -11,13 +11,20 @@ defmodule LoadBalancer do
 
 
   def handle_info(chunkData, state) do
-    Enum.reduce(1..3, %{}, fn pidNum, acc -> Map.put(acc, :"Printer#{pidNum}", Process.info(Process.whereis(:"Printer#{pidNum}"), :message_queue_len ) ) end)
+
+    pid =
+    Enum.reduce(1..3, %{}, fn pidNum, acc ->
+      Map.put(acc, :"Printer#{pidNum}", Process.info(Process.whereis(:"Printer#{pidNum}"), :message_queue_len ) )
+      end )
     |> Map.to_list()
     |> Enum.min_by(fn {_, minMessageQueueLen} -> minMessageQueueLen end)
     |> elem(0)
     |> Process.whereis
-    |> send(chunkData)
-    {:noreply, state}
+    #|> send(chunkData)
+    cond do
+      pid == nil -> send(self(),chunkData); {:noreply, state}
+      true -> send(pid, chunkData);     {:noreply, state}
+    end
   end
 
 
@@ -36,16 +43,16 @@ defmodule LoadBalancer do
   # end
   # end
 
-  def handle_call(:killMessage,_from, state) do
+  def handle_cast(:killMessage, state) do
     pr = :"Printer#{state}"
     state = state + 1
     if Process.whereis(pr) == nil do
-      GenServer.call(__MODULE__,:killMessage)
+      GenServer.cast(__MODULE__,  :killMessage)
       {:noreply, state}
     else
     cond do
-      state >= 4 -> send(pr, :killMessage);  {:noreply, 1}
-      true ->   send(pr, :killMessage);    {:noreply, state}
+      state >= 4 -> GenServer.cast(pr, :killMessage);  {:noreply, 1}
+      true ->   GenServer.cast(pr, :killMessage);    {:noreply, state}
     end
   end
   end

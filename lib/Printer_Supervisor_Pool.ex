@@ -1,8 +1,8 @@
 defmodule PrinterPoolSupervisor do
   use Supervisor
 
-  def start_link(_) do
-    Supervisor.start_link(__MODULE__, :ok, name: __MODULE__ )
+  def start_link() do
+    Supervisor.start_link(__MODULE__,  name: __MODULE__ )
   end
 
   def init(_) do
@@ -22,6 +22,12 @@ defmodule PrinterPoolSupervisor do
       %{
         id: :Printer3,
         start: {Printer, :start, [:Printer3]},
+        restart: :permanent,
+        type: :worker
+      },
+      %{
+        id: :LoadBalancer,
+        start: {LoadBalancer, :start, []},
         restart: :permanent,
         type: :worker
       }
