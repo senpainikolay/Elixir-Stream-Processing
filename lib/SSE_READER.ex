@@ -15,9 +15,10 @@ defmodule SSE_READER do
     [_,data] =  Regex.run(~r/data: ({.+})\n\n$/, chunk)
     case Jason.decode(data) do
       {:ok, chunkData} ->
-        IO.inspect(chunkData["message"]["tweet"]["text"])
+        #IO.inspect(chunkData["message"]["tweet"]["text"])
         #IO.inspect(chunkData["message"]["tweet"]["entities"]["hashtags"])
-        :timer.sleep(1000)
+        send(Printer, chunkData)
+        #:timer.sleep(1000)
       {:error, _ } -> nil
     end
     {:noreply, state}

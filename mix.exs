@@ -22,7 +22,8 @@ defmodule Lab1.MixProject do
   defp deps do
     [
       {:jason, "~> 1.3"},
-    {:httpoison, "~> 2.0"}
+    {:httpoison, "~> 2.0"},
+    {:statistics, "~> 0.6.2"}
   ]
   end
 end
