@@ -24,12 +24,6 @@ defmodule PrinterPoolSupervisor do
         start: {Printer, :start, [:Printer3]},
         restart: :permanent,
         type: :worker
-      },
-      %{
-        id: :LoadBalancer,
-        start: {LoadBalancer, :start, []},
-        restart: :permanent,
-        type: :worker
       }
     ]
     Supervisor.init(children, strategy: :one_for_one)

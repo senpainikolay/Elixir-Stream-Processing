@@ -8,11 +8,20 @@ defmodule SSE_READER do
   def init(url) do
     IO.puts "Connecting to stream..."
     HTTPoison.get!(url, [], [recv_timeout: :infinity, stream_to: self()])
-    spawn(fn -> killMe() end )
     {:ok, nil}
   end
 
 
+
+  def handle_info(%HTTPoison.AsyncEnd{id: ref}, state) do
+    IO.puts("AAAAAAAAAAUUUUUUUUUUUUUUUUUUUUUUUUUUFFFFFFFFFFFFFFFFFfffff")
+    {:noreply, state}
+  end
+
+  def handle_info(%HTTPoison.AsyncChunk{chunk: ""}, state) do
+    GenServer.cast(LoadBalancer, :killMessage)
+    {:noreply, state}
+  end
 
 
   def handle_info(%HTTPoison.AsyncChunk{chunk: chunk}, state) do
@@ -24,7 +33,7 @@ defmodule SSE_READER do
         send(HashtagExtractor, chunkData)
         #send(Printer, chunkData)
         #:timer.sleep(1000)
-      {:error, _ } -> nil
+      {:error, _ } -> nil;  {:noreply, state}
     end
     {:noreply, state}
   end
@@ -40,17 +49,6 @@ defmodule SSE_READER do
     {:noreply, state}
   end
 
-  def handle_call(:killMessageTrigger , _from, state) do
-    GenServer.cast(LoadBalancer, :killMessage)
-    spawn(fn -> killMe() end )
-    {:noreply, state}
-  end
-
-
-  def killMe() do
-    :timer.sleep(:rand.uniform(100)+3000)
-    GenServer.call(__MODULE__, :killMessageTrigger)
-  end
 
 
 end
