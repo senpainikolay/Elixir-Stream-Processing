@@ -16,7 +16,7 @@ defmodule SSE_READER do
     case Jason.decode(data) do
       {:ok, chunkData} ->
         #IO.inspect(chunkData["message"]["tweet"]["text"])
-        send(HashtagExtractor, chunkData)
+        send(LoadBalancer, chunkData)
         #send(Printer, chunkData)
         #:timer.sleep(1000)
       {:error, _ } -> nil

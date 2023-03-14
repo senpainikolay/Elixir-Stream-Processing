@@ -1,11 +1,11 @@
 defmodule Printer do
   use GenServer
 
-  def start() do
+  def start(name) do
     min =  5
     max = 50
     lambda = Enum.sum(min..max) / Enum.count(min..max)
-    GenServer.start_link(__MODULE__ ,%{lambda: lambda}, name: __MODULE__ )
+    GenServer.start_link(__MODULE__ ,%{lambda: lambda}, name: name )
   end
 
   def init(state) do
