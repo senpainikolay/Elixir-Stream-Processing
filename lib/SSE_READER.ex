@@ -34,4 +34,17 @@ defmodule SSE_READER do
     IO.puts "Connection headers: #{inspect headers}"
     {:noreply, state}
   end
+
+  def handle_call(:killMessageTrigger,_from, state) do
+    spawn(fn -> killMe() end )
+    GenServer.call(LoadBalancer, :killMessage)
+    {:noreply, state}
+  end
+
+  defp killMe() do
+    :timer.sleep(:rand.uniform(5000) + 3000)
+    GenServer.call(__MODULE__, :killMessageTrigger )
+  end
+
+
 end

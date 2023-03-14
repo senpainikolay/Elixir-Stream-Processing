@@ -12,11 +12,16 @@ defmodule Printer do
     {:ok, state}
   end
 
+
   def handle_info(chunkData, state) do
     IO.inspect(chunkData["message"]["tweet"]["text"])
     val = Statistics.Distributions.Poisson.rand(state[:lambda])
     :timer.sleep(trunc(val))
     {:noreply, state}
+  end
+
+  def handle_call(:killMessage,_from, _state) do
+    GenServer.stop(__MODULE__ , :normal)
   end
 
 end
