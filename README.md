@@ -1,8 +1,7 @@
 # Lab1
 
-## Message flow: 
-!Screenshot[flow.png] 
+## Message flow:  
+![Screenshot](flow.png)
 
-
-##  Supervision structure: 
-!Screenshot[sup.png]
+##  Supervision structure:  
+![Screenshot](sup.png)
