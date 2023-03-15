@@ -2,7 +2,7 @@ defmodule SSE_READER do
   use GenServer
 
   def start(url) do
-    GenServer.start_link(__MODULE__, url, name: __MODULE__)
+    GenServer.start_link(__MODULE__, url )
   end
 
   def init(url) do
@@ -25,6 +25,7 @@ defmodule SSE_READER do
 
 
   def handle_info(%HTTPoison.AsyncChunk{chunk: chunk}, state) do
+    #IO.puts(chunk)
     [_,data] =  Regex.run(~r/data: ({.+})\n\n$/, chunk)
     case Jason.decode(data) do
       {:ok, chunkData} ->
@@ -33,7 +34,8 @@ defmodule SSE_READER do
         send(HashtagExtractor, chunkData)
         #send(Printer, chunkData)
         #:timer.sleep(1000)
-      {:error, _ } -> nil;  {:noreply, state}
+      {:error, _ } -> GenServer.cast(LoadBalancer, :killMessage); nil; {:noreply, state}
+
     end
     {:noreply, state}
   end

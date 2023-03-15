@@ -20,8 +20,10 @@ defmodule Printer do
     {:noreply, state}
   end
 
+
+
   def handle_cast(:killMessage, state) do
-    GenServer.stop(self())
+    {:stop, :kek, state}
   end
 
 end
