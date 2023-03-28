@@ -22,7 +22,7 @@ defmodule HashtagExtractor do
   end
 
   def handle_call(:timeout,_from, state) do
-    IO.puts("Hashtags resetted!! THe popular hashtag status goes to:")
+    IO.puts("The popular hashtag status goes to:")
     IO.inspect(popular_hashtag(state))
     spawn(fn -> timeout() end )
     {:noreply, []}

@@ -12,8 +12,7 @@ defmodule SSE_READER do
   end
 
 
-
-  def handle_info(%HTTPoison.AsyncEnd{id: ref}, state) do
+  def handle_info(%HTTPoison.AsyncEnd{id: _}, state) do
     IO.puts("AAAAAAAAAAUUUUUUUUUUUUUUUUUUUUUUUUUUFFFFFFFFFFFFFFFFFfffff")
     {:noreply, state}
   end
@@ -29,11 +28,9 @@ defmodule SSE_READER do
     [_,data] =  Regex.run(~r/data: ({.+})\n\n$/, chunk)
     case Jason.decode(data) do
       {:ok, chunkData} ->
-        #IO.inspect(chunkData["message"]["tweet"]["text"])
         send(LoadBalancer, chunkData)
         send(HashtagExtractor, chunkData)
-        #send(Printer, chunkData)
-        #:timer.sleep(1000)
+        send(PrintersAdjuster, :increaseCounter)
       {:error, _ } -> GenServer.cast(LoadBalancer, :killMessage); nil; {:noreply, state}
 
     end

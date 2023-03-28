@@ -14,7 +14,7 @@ defmodule Printer do
 
 
   def handle_info(chunkData, state) do
-    IO.inspect(chunkData["message"]["tweet"]["text"])
+    #IO.inspect(chunkData["message"]["tweet"]["text"])
     val = Statistics.Distributions.Poisson.rand(state[:lambda])
     :timer.sleep(trunc(val))
     {:noreply, state}
@@ -25,5 +25,10 @@ defmodule Printer do
   def handle_cast(:killMessage, state) do
     {:stop, :kek, state}
   end
+
+  def handle_cast(:killMessage2, state) do
+    {:stop, :kill, state}
+  end
+
 
 end

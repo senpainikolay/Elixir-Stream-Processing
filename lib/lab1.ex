@@ -6,32 +6,37 @@ defmodule Lab1 do
     # #LoadBalancer.start
     # SSE_READER.start("localhost:4000/tweets/1")
     # SSE_READER.start("localhost:4000/tweets/2")
+
     children = [
       %{
-        id: Ok1,
-        start: {PrinterPoolSupervisor, :start_link, []},
+        id: :PrinterSupervisor,
+        start: {PrinterPoolSupervisor, :start_link, [:ok]},
         type: :supervisor
       },
       %{
         id: :LoadBalancer,
-        start: {LoadBalancer, :start, []  }
+        start: {LoadBalancer, :start,  [%{"pidCounter" => 3}] }
       },
       %{
-        id: Ok2,
+        id: :HashTahEx,
         start: {HashtagExtractor, :start, []}
       },
       %{
-        id: Ok3,
+        id: :SSE_READER1,
         start: {SSE_READER, :start, ["localhost:4000/tweets/1"]}
       },
       %{
-        id: Ok4,
+        id: :SSE_READER2,
         start: {SSE_READER, :start, ["localhost:4000/tweets/2"]}
+      },
+      %{
+        id: :WorkerPoolAdjuster,
+        start: {PrintersAdjuster, :start, [:ok]}
       }
     ]
 
-    # Now we start the supervisor with the children and a strategy
     {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one)
+
 
     loop()
   end
