@@ -19,7 +19,8 @@ defmodule LoadBalancer do
     len = childrenCountAll.workers
     Enum.filter(1..len, fn x -> Process.whereis(:"Printer#{x}") != nil end)
     |> Enum.reduce( %{}, fn pidNum, acc ->
-      Map.put(acc, :"Printer#{pidNum}", Process.info(Process.whereis(:"Printer#{pidNum}"), :message_queue_len ) ) end )
+      Map.put(acc, :"Printer#{pidNum}", Process.info(Process.whereis(:"Printer#{pidNum}"), :message_queue_len ) )
+     end )
     |> Map.to_list()
     |> Enum.min_by(fn {_, minMessageQueueLen} -> minMessageQueueLen end)
     |> elem(0)

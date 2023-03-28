@@ -9,6 +9,10 @@ defmodule Lab1 do
 
     children = [
       %{
+        id: :SwearWordsRemover,
+        start: {SwearWordsRemover, :start,  [:ok] }
+      },
+      %{
         id: :PrinterSupervisor,
         start: {PrinterPoolSupervisor, :start_link, [:ok]},
         type: :supervisor

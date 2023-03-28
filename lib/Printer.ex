@@ -15,6 +15,8 @@ defmodule Printer do
 
   def handle_info(chunkData, state) do
     #IO.inspect(chunkData["message"]["tweet"]["text"])
+    GenServer.call(SwearWordsRemover, chunkData["message"]["tweet"]["text"])
+    |> IO.inspect
     val = Statistics.Distributions.Poisson.rand(state[:lambda])
     :timer.sleep(trunc(val))
     {:noreply, state}
