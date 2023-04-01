@@ -39,7 +39,7 @@ defmodule Lab1 do
       }
     ]
 
-    {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one)
+    {:ok, _} = Supervisor.start_link(children, strategy: :one_for_one, max_restarts: 10, max_seconds: 10 )
 
 
     loop()

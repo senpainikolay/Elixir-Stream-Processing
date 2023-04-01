@@ -26,7 +26,7 @@ defmodule PrinterPoolSupervisor do
         type: :worker
       }
     ]
-    Supervisor.init(children, strategy: :one_for_one)
+    Supervisor.init(children, strategy: :one_for_one,  max_restarts: 10, max_seconds: 10 )
   end
 
 end

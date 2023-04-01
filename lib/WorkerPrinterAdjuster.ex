@@ -19,16 +19,19 @@ defmodule PrintersAdjuster do
   def handle_call(:timeout,from, state) do
     currentReqs = Map.get(state, :incomingRequestCounter)
     prevRequestsNum =  Map.get(state, :prevRequestCount)
-    if  abs(prevRequestsNum - currentReqs) > 200 or currentReqs > 200 do
+    if  abs(prevRequestsNum - currentReqs) > 200 do
       childrenCountAll = Supervisor.count_children(PrinterPoolSupervisor)
-      if 100 - currentReqs < 0  and childrenCountAll.workers >= 3  do
+      IO.inspect(childrenCountAll)
+      IO.inspect("CURRENTTTT REQSS:::")
+      IO.puts(currentReqs)
+      if currentReqs > 400   and childrenCountAll.workers >= 3  do
         Supervisor.start_child(PrinterPoolSupervisor, %{id: String.to_atom("Printer#{childrenCountAll.workers + 1}"), start: {Printer, :start, [String.to_atom("Printer#{childrenCountAll.workers + 1}")]}})
       end
 
-      if 100 - currentReqs > 0 and childrenCountAll.workers >= 3   do
+      if currentReqs < 400 and childrenCountAll.workers >= 3   do
          spawn (fn ->
         childrenCount = childrenCountAll.workers
-        GenServer.call(:"Printer#{childrenCount}", :killMessage2)
+        GenServer.cast(:"Printer#{childrenCount}", :killMessage2)
         end)
       end
     end
