@@ -11,7 +11,6 @@ defmodule SwearWordsRemover do
     {:ok, state}
   end
 
-
   def handle_call(sentence, from,   state) do
     resp = Enum.map(String.split(sentence),  fn x ->
   if isBad?(x,state) == true do

@@ -1,50 +1,39 @@
 defmodule PrintersAdjuster do
   use GenServer
   def start(_) do
-    GenServer.start_link(__MODULE__ , %{}, name: __MODULE__ )
+    GenServer.start_link(__MODULE__ , 0, name: __MODULE__ )
   end
 
   def init(state) do
-    state = Map.put(state, :incomingRequestCounter,0)
-    state = Map.put(state, :prevRequestCount,100)
     spawn(fn -> timeout() end )
     {:ok, state}
   end
 
   def handle_info(:increaseCounter, state) do
-    state = Map.update!(state, :incomingRequestCounter,  &(&1 + 1))
+    state = state + 1
     {:noreply, state}
   end
 
-  def handle_call(:timeout,from, state) do
-    currentReqs = Map.get(state, :incomingRequestCounter)
-    prevRequestsNum =  Map.get(state, :prevRequestCount)
-    if  abs(prevRequestsNum - currentReqs) > 200 do
-      childrenCountAll = Supervisor.count_children(PrinterPoolSupervisor)
-      IO.inspect(childrenCountAll)
-      IO.inspect("CURRENTTTT REQSS:::")
-      IO.puts(currentReqs)
-      if currentReqs > 400   and childrenCountAll.workers >= 3  do
-        Supervisor.start_child(PrinterPoolSupervisor, %{id: String.to_atom("Printer#{childrenCountAll.workers + 1}"), start: {Printer, :start, [String.to_atom("Printer#{childrenCountAll.workers + 1}")]}})
-      end
-
-      if currentReqs < 400 and childrenCountAll.workers >= 3   do
-         spawn (fn ->
-        childrenCount = childrenCountAll.workers
-        GenServer.cast(:"Printer#{childrenCount}", :killMessage2)
-        end)
-      end
+  def handle_info( :timeout, state) do
+    childrenCountAll = Supervisor.count_children(PrinterPoolSupervisor)
+    IO.inspect(childrenCountAll)
+    IO.inspect("CURRENTTTT REQSS:::")
+    IO.puts(state)
+    if state > 500   and childrenCountAll.workers >= 3  do
+      Supervisor.start_child(PrinterPoolSupervisor, %{id: String.to_atom("Printer#{childrenCountAll.workers + 1}"), start: {Printer, :start, [String.to_atom("Printer#{childrenCountAll.workers + 1}")]}})
     end
-    state = Map.replace(state, :incomingRequestCounter, 0)
-    state = Map.replace(state, :prevRequestCount, currentReqs)
+    if state < 500 and childrenCountAll.workers >= 3   do
+      childrenCount = childrenCountAll.workers;
+      GenServer.cast(:"Printer#{childrenCount}", :killMessage2)
+    end
     spawn(fn -> timeout() end )
-    GenServer.reply(from, :ok)
+    state = 0
     {:noreply, state}
   end
 
   def timeout() do
     :timer.sleep(3000)
-    GenServer.call(__MODULE__, :timeout )
+    send(__MODULE__, :timeout )
   end
 
 end

@@ -1,12 +1,6 @@
 defmodule Lab1 do
 
   def run do
-    # PrinterPoolSupervisor.start_link()
-    # HashtagExtractor.start
-    # #LoadBalancer.start
-    # SSE_READER.start("localhost:4000/tweets/1")
-    # SSE_READER.start("localhost:4000/tweets/2")
-
     children = [
       %{
         id: :SwearWordsRemover,
@@ -14,7 +8,7 @@ defmodule Lab1 do
       },
       %{
         id: :PrinterSupervisor,
-        start: {PrinterPoolSupervisor, :start_link, [:ok]},
+        start: {GenericSupervisorPool, :start, [ { "Printer", 3 } ]},
         type: :supervisor
       },
       %{

@@ -10,7 +10,6 @@ defmodule SentimentScore do
       |> Enum.map( fn x  -> String.replace(x,"\n", "") end)
       |> Enum.map( fn x  -> String.split(x,"\t") end)
       |> Enum.reduce( %{}, fn x, acc  -> Map.put(acc, List.first(x), parseInt(x))  end)
-   #IO.inspect(emoationalScoreMap)
     GenServer.start_link(__MODULE__ , emoationalScoreMap , name:  __MODULE__ )
   end
 
