@@ -1,7 +1,7 @@
 defmodule SentimentScore do
   use GenServer
 
-  def start(_) do
+  def start(name) do
     url = "localhost:4000/emotion_values"
     %{body: response} = HTTPoison.get!(url)
     emoationalScoreMap =
@@ -10,7 +10,7 @@ defmodule SentimentScore do
       |> Enum.map( fn x  -> String.replace(x,"\n", "") end)
       |> Enum.map( fn x  -> String.split(x,"\t") end)
       |> Enum.reduce( %{}, fn x, acc  -> Map.put(acc, List.first(x), parseInt(x))  end)
-    GenServer.start_link(__MODULE__ , emoationalScoreMap , name:  __MODULE__ )
+    GenServer.start_link(__MODULE__ , emoationalScoreMap , name:  name )
   end
 
   defp parseInt(b) do
@@ -23,7 +23,17 @@ defmodule SentimentScore do
   end
 
 
-  def handle_call(sentence, from,   state) do
+  def handle_cast(sentence,  state) do
+    resp =
+    Enum.map( String.split(sentence),  fn x ->
+    val = state[x]
+     cond do
+      val == nil -> 0
+      true -> val
+     end
+    end)
+    IO.puts("MEAN EMOTIONAL SCORE:")
+    IO.inspect( Enum.sum(resp) / Enum.count(resp) )
     {:noreply, state}
   end
 

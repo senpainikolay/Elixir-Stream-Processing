@@ -8,6 +8,11 @@ defmodule Lab1 do
         type: :supervisor
       },
       %{
+        id: :SentimentScoreSupervisor,
+        start: {GenericSupervisorPool, :start,  [{"SentimentScore", 3}] },
+        type: :supervisor
+      },
+      %{
         id: :PrinterSupervisor,
         start: {GenericSupervisorPool, :start, [ { "Printer", 3 } ]},
         type: :supervisor

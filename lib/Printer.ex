@@ -16,7 +16,7 @@ defmodule Printer do
   def handle_info(chunkData, state) do
     #IO.inspect(chunkData["message"]["tweet"]["text"])
     sendFrutherToSupervisorPool(chunkData["message"]["tweet"]["text"], "SwearWordsRemover", SwearWordsRemoverPoolSupervisor )
-    |> IO.inspect()
+    sendFrutherToSupervisorPool(chunkData["message"]["tweet"]["text"], "SentimentScore", SentimentScorePoolSupervisor )
     val = Statistics.Distributions.Poisson.rand(state[:lambda])
     :timer.sleep(trunc(val))
     {:noreply, state}
@@ -34,7 +34,7 @@ defmodule Printer do
     |> Enum.min_by(fn {_, minMessageQueueLen} -> minMessageQueueLen end)
     |> elem(0)
     |> Process.whereis
-    |> GenServer.call(chunkData)
+    |> GenServer.cast(chunkData)
   end
 
 

@@ -15,6 +15,7 @@ defmodule GenericSupervisorPool do
     cond  do
       name == "Printer" -> {Printer, PrinterPoolSupervisor }
       name == "SwearWordsRemover" -> { SwearWordsRemover, SwearWordsRemoverPoolSupervisor }
+      name == "SentimentScore" -> {SentimentScore, SentimentScorePoolSupervisor }
     end
   end
 
