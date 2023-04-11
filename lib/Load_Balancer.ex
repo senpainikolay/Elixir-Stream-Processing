@@ -6,15 +6,29 @@ defmodule LoadBalancer do
   end
 
   def init(state) do
-    childrenCountAll = Supervisor.count_children(PrinterPoolSupervisor)
-    len = childrenCountAll.workers
-    state = Map.replace(state, "pidCounter", len)
+    state = Map.replace(state, "pidCounter", 3)
     state = Map.put(state, "currentKillTarget",1)
     {:ok, state}
   end
 
 
   def handle_info(chunkData, state) do
+    childrenCountAll = Supervisor.count_children(PrinterPoolSupervisor)
+    len = childrenCountAll.workers
+    Enum.filter(1..len, fn x -> Process.whereis(:"Printer#{x}") != nil end)
+    |> Enum.reduce( %{}, fn pidNum, acc ->
+      Map.put(acc, :"Printer#{pidNum}", Process.info(Process.whereis(:"Printer#{pidNum}"), :message_queue_len ) )
+     end )
+    |> Map.to_list()
+    |> Enum.min_by(fn {_, minMessageQueueLen} -> minMessageQueueLen end)
+    |> elem(0)
+    |> Process.whereis
+    |> send(chunkData)
+
+    {:noreply, state}
+  end
+
+  def handle_call(chunkData, state) do
     childrenCountAll = Supervisor.count_children(PrinterPoolSupervisor)
     len = childrenCountAll.workers
     Enum.filter(1..len, fn x -> Process.whereis(:"Printer#{x}") != nil end)

@@ -1,10 +1,10 @@
 defmodule SwearWordsRemover do
   use GenServer
 
-  def start(_) do
+  def start(name) do
     file_contents = File.read!("swear-words.json")
     {:ok, json_data} = Jason.decode(file_contents)
-    GenServer.start_link(__MODULE__ , json_data , name:  __MODULE__ )
+    GenServer.start_link(__MODULE__ , json_data , name:  name )
   end
 
   def init(state) do

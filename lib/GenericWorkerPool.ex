@@ -14,6 +14,7 @@ defmodule GenericSupervisorPool do
   defp infoFactoryMethod(name) do
     cond  do
       name == "Printer" -> {Printer, PrinterPoolSupervisor }
+      name == "SwearWordsRemover" -> { SwearWordsRemover, SwearWordsRemoverPoolSupervisor }
     end
   end
 

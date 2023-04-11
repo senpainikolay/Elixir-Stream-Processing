@@ -3,8 +3,9 @@ defmodule Lab1 do
   def run do
     children = [
       %{
-        id: :SwearWordsRemover,
-        start: {SwearWordsRemover, :start,  [:ok] }
+        id: :SwearWordsRemoverSupervisor,
+        start: {GenericSupervisorPool, :start,  [{"SwearWordsRemover", 3}] },
+        type: :supervisor
       },
       %{
         id: :PrinterSupervisor,
@@ -16,7 +17,7 @@ defmodule Lab1 do
         start: {LoadBalancer, :start,  [%{"pidCounter" => 3}] }
       },
       %{
-        id: :HashTahEx,
+        id: :HashTagEx,
         start: {HashtagExtractor, :start, []}
       },
       %{

@@ -15,11 +15,26 @@ defmodule Printer do
 
   def handle_info(chunkData, state) do
     #IO.inspect(chunkData["message"]["tweet"]["text"])
-    GenServer.call(SwearWordsRemover, chunkData["message"]["tweet"]["text"])
-    #|> IO.inspect
+    sendFrutherToSupervisorPool(chunkData["message"]["tweet"]["text"], "SwearWordsRemover", SwearWordsRemoverPoolSupervisor )
+    |> IO.inspect()
     val = Statistics.Distributions.Poisson.rand(state[:lambda])
     :timer.sleep(trunc(val))
     {:noreply, state}
+  end
+
+  defp sendFrutherToSupervisorPool(chunkData, name, supervisorName) do
+   #GenServer.call(supervisorName, chunkData["message"]["tweet"]["text"])
+    childrenCountAll = Supervisor.count_children(supervisorName)
+    len = childrenCountAll.workers
+    Enum.filter(1..len, fn x -> Process.whereis(:"#{name}#{x}") != nil end)
+    |> Enum.reduce( %{}, fn pidNum, acc ->
+      Map.put(acc, :"#{name}#{pidNum}", Process.info(Process.whereis(:"#{name}#{pidNum}"), :message_queue_len ) )
+     end )
+    |> Map.to_list()
+    |> Enum.min_by(fn {_, minMessageQueueLen} -> minMessageQueueLen end)
+    |> elem(0)
+    |> Process.whereis
+    |> GenServer.call(chunkData)
   end
 
 
