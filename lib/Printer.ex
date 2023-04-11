@@ -15,8 +15,10 @@ defmodule Printer do
 
   def handle_info(chunkData, state) do
     #IO.inspect(chunkData["message"]["tweet"]["text"])
-    sendFrutherToSupervisorPool(chunkData["message"]["tweet"]["text"], "SwearWordsRemover", SwearWordsRemoverPoolSupervisor )
-    sendFrutherToSupervisorPool(chunkData["message"]["tweet"]["text"], "SentimentScore", SentimentScorePoolSupervisor )
+    #sendFrutherToSupervisorPool(chunkData["message"]["tweet"]["text"], "SwearWordsRemover", SwearWordsRemoverPoolSupervisor )
+    #sendFrutherToSupervisorPool(chunkData["message"]["tweet"]["text"], "SentimentScore", SentimentScorePoolSupervisor )
+    sendFrutherToSupervisorPool(chunkData, "EngagementRatio", EngagementRatioPoolSupervisor )
+
     val = Statistics.Distributions.Poisson.rand(state[:lambda])
     :timer.sleep(trunc(val))
     {:noreply, state}

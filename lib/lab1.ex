@@ -13,6 +13,11 @@ defmodule Lab1 do
         type: :supervisor
       },
       %{
+        id: :EngagementRatioSupervisor,
+        start: {GenericSupervisorPool, :start,  [{"EngagementRatio", 3}] },
+        type: :supervisor
+      },
+      %{
         id: :PrinterSupervisor,
         start: {GenericSupervisorPool, :start, [ { "Printer", 3 } ]},
         type: :supervisor
