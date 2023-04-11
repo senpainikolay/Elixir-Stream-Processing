@@ -22,9 +22,7 @@ defmodule SSE_READER do
     {:noreply, state}
   end
 
-
   def handle_info(%HTTPoison.AsyncChunk{chunk: chunk}, state) do
-    #IO.puts(chunk)
     [_,data] =  Regex.run(~r/data: ({.+})\n\n$/, chunk)
     case Jason.decode(data) do
       {:ok, chunkData} ->
