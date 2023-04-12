@@ -1,0 +1,25 @@
+@startuml
+title Message Flow
+
+participant "Docker Container" as DC
+
+participant "SSE Reader" as SSE 
+participant "Hashtag Extractor" as HE
+participant "Printer Adjuster" as PA
+participant "Load Balancer" as LB
+participant "PrinterPool" as PP 
+participant "SwearWordPool" as SW 
+participant "SentimentScorePool" as SC 
+participant "EngagementRatioPool" as ER
+
+
+DC -> SSE: sse stream
+SSE -> LB: chunk 
+SSE -> HE: 
+SSE -> PA: request counter
+LB -> PP:   
+PA -> PP: kill/spawn worker
+PP -> SW: 
+PP -> SC: 
+PP -> ER: 
+@enduml
