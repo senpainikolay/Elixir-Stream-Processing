@@ -10,12 +10,38 @@ defmodule Batcher do
     state = Map.put(state, "currentFill", 0)
     state = Map.put(state, "batchSize", 50)
     state = Map.put(state, "printable",  [])
+    state = Map.put(state, "currentTimeoutPid",  :ok)
+
     {:ok, state}
+  end
+
+  def handle_cast(:timeoutReset, state ) do
+    { _,  existingTweets} = Map.fetch(state, "printable")
+      IO.inspect(existingTweets)
+      state = Map.replace(state, "printable", [] )
+      state = Map.replace(state, "currentFill", 0 )
+      {:noreply, state}
+  end
+
+  def handle_cast(:callTimeout, state ) do
+    pid =
+      spawn( fn ->
+      :timer.sleep(1000)
+      GenServer.cast(__MODULE__ , :timeoutReset )
+      end)
+      state = Map.replace(state, "currentTimeoutPid", pid )
+      {:noreply, state}
   end
 
   def handle_cast(chunkData,  state) do
     { _,  currentSize } = Map.fetch(state, "currentFill")
     { _,  bufferSize } = Map.fetch(state, "batchSize")
+
+
+    if currentSize == 0 do
+      GenServer.cast( self(), :callTimeout)
+    end
+
 
     cond do
 
@@ -24,9 +50,12 @@ defmodule Batcher do
       IO.inspect(existingTweets)
       state = Map.replace(state, "printable", [] )
       state = Map.replace(state, "currentFill", 0 )
+      {_ ,  currentPid} = Map.fetch(state, "currentTimeoutPid")
+      Process.exit(currentPid, :kill)
       {:noreply, state}
 
     currentSize < bufferSize ->
+
 
     {redactedText, sentimentScore,  engagementRatio } = chunkData
 
@@ -43,5 +72,6 @@ defmodule Batcher do
     end
 
   end
+
 
 end
