@@ -33,8 +33,7 @@ defmodule Aggregator do
 
     {redactedText, sentimentScore,  engagementRatio }   = Map.get(state, id)
     if redactedText != -1  and sentimentScore != -1  and engagementRatio != -1 do
-        IO.inspect("DONEEEEEe")
-        # Send To Batcher
+      GenServer.cast(Batcher,   {redactedText, sentimentScore,  engagementRatio }  )
     end
 
     {:noreply, state}

@@ -29,7 +29,7 @@ defmodule EngagementRatio do
 
     engagementRatio =
     cond do
-      followers == 0 -> 0
+      followers == 0 -> 0.0
       true -> (fav + ret) / followers
     end
 
