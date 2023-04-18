@@ -31,6 +31,10 @@ defmodule Lab1 do
         start: {HashtagExtractor, :start, []}
       },
       %{
+        id: :Aggregator,
+        start: {Aggregator, :start, [:ok]}
+      },
+      %{
         id: :SSE_READER1,
         start: {SSE_READER, :start, ["localhost:4000/tweets/1"]}
       },

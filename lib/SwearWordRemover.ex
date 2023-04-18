@@ -12,7 +12,7 @@ defmodule SwearWordsRemover do
   end
 
   #def handle_call(sentence, from,   state) do
-  def handle_cast(sentence, state) do
+  def handle_cast({id, sentence}, state) do
     resp = Enum.map(String.split(sentence),  fn x ->
   if isBad?(x,state) == true do
     " ******"
@@ -20,8 +20,8 @@ defmodule SwearWordsRemover do
       " #{x}"
     end
     end)
-    #GenServer.reply(from, List.to_string(resp))
-    IO.inspect(List.to_string(resp))
+    GenServer.cast(Aggregator, { id,  List.to_string(resp), 1 })
+    #IO.inspect(List.to_string(resp))
     {:noreply, state}
   end
 

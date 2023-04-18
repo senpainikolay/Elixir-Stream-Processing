@@ -10,7 +10,7 @@ defmodule EngagementRatio do
   end
 
 
-  def handle_cast(chunkData,  state) do
+  def handle_cast({id, chunkData},  state) do
     val = chunkData["message"]["tweet"]["retweeted_status"]["favorite_count"]
     fav =
       cond do
@@ -33,8 +33,9 @@ defmodule EngagementRatio do
       true -> (fav + ret) / followers
     end
 
-    IO.puts("ENGAGEMENT RATIO:  ")
-    IO.inspect(engagementRatio)
+    #IO.puts("ENGAGEMENT RATIO:  ")
+    #IO.inspect(engagementRatio)
+    GenServer.cast(Aggregator, { id, engagementRatio , 3 })
     {:noreply, state}
   end
 

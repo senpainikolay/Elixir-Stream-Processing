@@ -23,7 +23,7 @@ defmodule SentimentScore do
   end
 
 
-  def handle_cast(sentence,  state) do
+  def handle_cast({id, sentence},  state) do
     resp =
     Enum.map( String.split(sentence),  fn x ->
     val = state[x]
@@ -32,8 +32,9 @@ defmodule SentimentScore do
       true -> val
      end
     end)
-    IO.puts("MEAN EMOTIONAL SCORE:")
-    IO.inspect( Enum.sum(resp) / Enum.count(resp) )
+    #IO.puts("MEAN EMOTIONAL SCORE:")
+    GenServer.cast(Aggregator, { id,  Enum.sum(resp) / Enum.count(resp) , 2 })
+    #IO.inspect( Enum.sum(resp) / Enum.count(resp) )
     {:noreply, state}
   end
 
