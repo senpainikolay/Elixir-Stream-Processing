@@ -6,12 +6,7 @@
 
 ## Overall Arhitecture and Message Flow: 
 
-![Screenshot](media/week5/sup.png)
-
-
-![Screenshot](media/week5/msg.png)
-
-
+https://github.com/senpainikolay/Elixir-Stream-Processing/blob/main/report.md
 
 ## Overall Solution 
 
