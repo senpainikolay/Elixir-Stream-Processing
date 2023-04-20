@@ -8,7 +8,7 @@ defmodule Batcher do
   @spec init(map) :: {:ok, map}
   def init(state) do
     state = Map.put(state, "currentFill", 0)
-    state = Map.put(state, "batchSize", 50)
+    state = Map.put(state, "batchSize", 10)
     state = Map.put(state, "printable",  [])
     state = Map.put(state, "currentTimeoutPid",  :ok)
 
@@ -26,7 +26,7 @@ defmodule Batcher do
   def handle_cast(:callTimeout, state ) do
     pid =
       spawn( fn ->
-      :timer.sleep(1000)
+      :timer.sleep(10)
       GenServer.cast(__MODULE__ , :timeoutReset )
       end)
       state = Map.replace(state, "currentTimeoutPid", pid )
